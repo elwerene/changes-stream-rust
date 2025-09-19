@@ -5,7 +5,7 @@ use bytes::{buf::IntoIter, Bytes};
 use futures_util::stream::Stream;
 use log::error;
 use serde_json::Value;
-use std::{mem::replace, pin::Pin, task::Poll};
+use std::{mem::replace, pin::Pin, task::Poll, time::Duration};
 
 mod error;
 mod event;
@@ -63,7 +63,10 @@ impl ChangesStream {
             )
             .to_string();
 
-        let client = reqwest::Client::new();
+        let client = reqwest::ClientBuilder::new()
+            .connect_timeout(Duration::from_secs(60))
+            .read_timeout(Duration::from_secs(60))
+            .build()?;
         let res = client.post(url).json(payload).send().await?;
         let status = res.status();
         if !status.is_success() {
