@@ -43,13 +43,17 @@ async fn main() {
 }
 ```
 
+## errors
+
+A line that cannot be parsed yields `Err(Error::ParsingFailed)` and the stream continues. A failed read, such as a lost connection or no data for 60 seconds, yields `Err(Error::RequestFailed)` once and then the stream ends. For a continuous feed, request a `heartbeat` shorter than 60 seconds, for example `?feed=continuous&heartbeat=30000`.
+
 ## features
 
 ### metrics
 
-Enables metrics collection of the changes stream as counter values. The name is generated from the host and path of the url(database name). The metrics are:
- * `couchdb_changes_{name}_bytes`: Total bytes read from the changes stream
- * `couchdb_changes_{name}_entries`: Total parsed change entries
+Enables metrics collection of the changes stream as counter values. Each counter carries a `database` label, generated from the host and path of the url. The metrics are:
+ * `couchdb_changes_bytes_total`: Total bytes read from the changes stream
+ * `couchdb_changes_entries_total`: Total parsed entries
 
 ### raw_value_doc
 
